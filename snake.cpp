@@ -1,43 +1,40 @@
 #include <cstdlib>
 #include <ncurses.h>
 
-
+// global variables
 bool gameOver;
-const int width = 20, height = 20;
-int x, y, FruitX, FruitY, score; 
-enum eDirection {STOP = 0, LEFT, RIGHT, UP, DOWN};
+const int width = 20, height = 20; // dimentions of the board
+int x, y, FruitX, FruitY, score; // snake's head, cords of the fruit, and player score
+enum eDirection {STOP = 0, LEFT, RIGHT, UP, DOWN}; 
 eDirection dir; 
-
-int TailX[100],  TailY[100]; 
-int nTail = 0; 
+int TailX[100],  TailY[100]; // snake's tail
+int nTail = 0;  // length of the tail 
 
 void Setup()
 {
-
-	initscr(); 
+	initscr(); // initialze ncurses 
 	clear(); 
 	noecho(); 
 	cbreak(); 
 	curs_set(0); 
 
+	// initalize game varaibles 
 	gameOver = false; 
 	dir = STOP; 
 	x = width / 2; 
 	y = height / 2; 
 	FruitX = (rand()% width) + 1;
 	FruitY = (rand() % height) + 1;
-
 	score = 0;   
 }
 
 void Draw()
 {
 	clear(); 
-
+	// draw borders
 	for(int i = 0; i < width + 2; i++)
 		mvprintw(0,i,"+"); 
-
-
+	
 	for(int i = 0; i < height + 2; i++)
 	{
 		for(int j = 0; j < width + 2; j++)
@@ -45,6 +42,7 @@ void Draw()
 			if(i == 0 || i == 21)
 				mvprintw(i,j,"+");
 
+			// draw snake, fruit and tail
 			else if(j == 0 || j == 21)
 				mvprintw(i,j,"+"); 
 
@@ -60,6 +58,7 @@ void Draw()
 				}	
 		}
 	}
+	// print score
 	mvprintw(23,0,"Score %d", score); 
 
 	refresh(); 
@@ -67,11 +66,12 @@ void Draw()
 
 void Input()
 {
-	keypad(stdscr, TRUE);
+	keypad(stdscr, TRUE); // allows prog to know special keys (arrow keys)
 	halfdelay(1); 
 
-	int c = getch(); 
+	int c = getch(); // waits for user to press a key and store ASCII variable
 
+	// movement
 	switch(c)
 	{
 		case KEY_LEFT:
@@ -101,7 +101,8 @@ void Input()
 
 void Logic()
 {
-
+	// updating snake tail
+	// updates the positions of the snake's tail based on the previous positions and updates the snake's head position
 	int prevX = TailX[0]; 
 	int prevY = TailY[0]; 
 	int prev2X, prev2Y;
@@ -118,6 +119,7 @@ void Logic()
 		prevY = prev2Y;  
 	} 
 
+	// update direction
 	switch(dir)
 	{
 		case LEFT:
@@ -139,7 +141,8 @@ void Logic()
 		default:
 			break;
 	}
-
+	
+	// checks for collistion and fruit eaten
 	if(x > width || x < 1 || y < 1 || y > height)
 		gameOver = true; 
 
